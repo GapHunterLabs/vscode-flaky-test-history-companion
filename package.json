@@ -1,0 +1,63 @@
+{
+  "name": "flaky-test-history-companion",
+  "displayName": "Flaky Test History Companion",
+  "description": "Tracks pass/fail history per test across JUnit XML report runs and flags tests with mixed results (flaky). No data leaves your editor.",
+  "version": "0.1.0",
+  "publisher": "GapHunterLabs",
+  "icon": "images/icon.png",
+  "license": "Apache-2.0",
+  "engines": {
+    "vscode": "^1.85.0"
+  },
+  "categories": [
+    "Other",
+    "Linters"
+  ],
+  "keywords": [
+    "testing",    "flaky-tests",    "junit",    "ci"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/GapHunterLabs/vscode-flaky-test-history-companion.git"
+  },
+  "bugs": {
+    "url": "https://github.com/GapHunterLabs/vscode-flaky-test-history-companion/issues"
+  },
+  "activationEvents": [
+    "onStartupFinished"
+  ],
+  "main": "./out/extension.js",
+  "contributes": {
+    "commands": [
+      {
+        "command": "flakyTestHistoryCompanion.showFlakyTests",
+        "title": "Flaky Test History Companion: Show Flaky Tests"
+      },
+      {
+        "command": "flakyTestHistoryCompanion.clearHistory",
+        "title": "Flaky Test History Companion: Clear History"
+      }
+    ],
+    "configuration": {
+      "title": "Flaky Test History Companion",
+      "properties": {
+        "flakyTestHistoryCompanion.reportGlob": {
+          "type": "string",
+          "default": "**/{junit.xml,TEST-*.xml,test-results/**/*.xml}",
+          "description": "Glob pattern for JUnit XML report files to watch and parse."
+        }
+      }
+    }
+  },
+  "scripts": {
+    "vscode:prepublish": "npm run compile",
+    "compile": "tsc -p ./",
+    "watch": "tsc -w -p ./",
+    "test": "tsc -p ./ && node --test \"out/test/**/*.test.js\""
+  },
+  "devDependencies": {
+    "@types/vscode": "^1.85.0",
+    "@types/node": "^22.0.0",
+    "typescript": "^5.6.2"
+  }
+}
