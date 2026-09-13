@@ -1,6 +1,7 @@
 import * as vscode from 'vscode';
 import { parseJUnitXml } from './junitParser';
 import { recordRun, getFlakyTests, type TestHistory } from './history';
+import { recordHit } from './reviewPrompt';
 
 const HISTORY_KEY = 'flakyTestHistoryCompanion.history';
 const DEFAULT_GLOB = '**/{junit.xml,TEST-*.xml,test-results/**/*.xml}';
@@ -24,8 +25,8 @@ async function ingestReport(state: vscode.Memento, uri: vscode.Uri): Promise<voi
   await state.update(HISTORY_KEY, next);
 }
 
-function showFlakyTests(state: vscode.Memento): void {
-  const flaky = getFlakyTests(readHistory(state));
+function showFlakyTests(context: vscode.ExtensionContext): void {
+  const flaky = getFlakyTests(readHistory(context.workspaceState));
   outputChannel.clear();
   outputChannel.show(true);
   if (flaky.length === 0) {
@@ -44,6 +45,11 @@ function showFlakyTests(state: vscode.Memento): void {
   for (const t of flaky) {
     outputChannel.appendLine(`  ${t.testId}`);
     outputChannel.appendLine(`    ${t.passCount} pass / ${t.failCount} fail across ${t.totalRuns} run(s) -- last: ${t.lastOutcome}`);
+    // A test actually identified as flaky (mixed pass/fail across real
+    // runs) is the genuine value moment here -- dedup'd by testId so
+    // re-running "Show Flaky Tests" on the same still-flaky test
+    // doesn't inflate the count.
+    recordHit(context, t.testId);
   }
 }
 
@@ -61,7 +67,7 @@ export function activate(context: vscode.ExtensionContext): void {
   watcher.onDidChange(onReport);
 
   context.subscriptions.push(
-    vscode.commands.registerCommand('flakyTestHistoryCompanion.showFlakyTests', () => showFlakyTests(context.workspaceState)),
+    vscode.commands.registerCommand('flakyTestHistoryCompanion.showFlakyTests', () => showFlakyTests(context)),
     vscode.commands.registerCommand('flakyTestHistoryCompanion.clearHistory', async () => {
       await context.workspaceState.update(HISTORY_KEY, {});
       vscode.window.showInformationMessage('Flaky Test History Companion: history cleared.');
