@@ -2,7 +2,7 @@
   "name": "flaky-test-history-companion",
   "displayName": "Flaky Test History Companion",
   "description": "Tracks pass/fail history per test across JUnit XML report runs and flags tests with mixed results (flaky). No data leaves your editor.",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "publisher": "GapHunterLabs",
   "icon": "images/icon.png",
   "license": "Apache-2.0",
